@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>\丹尼畢業快樂/</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    @font-face { font-family: 'Cubic 11'; src: url('https://cdn.jsdelivr.net/npm/man-tout-font@1.0.1/font/MTC.woff2') format('woff2'); }
+    body { font-family: 'Cubic 11', 'Press Start 2P', cursive; background-color: #74b9ff; color: #222; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; image-rendering: pixelated; }
+    .container { position: relative; text-align: center; background-color: #fefefe; padding: 30px; border-radius: 0; border: 4px solid #222; box-shadow: 8px 8px 0px #222; width: 90%; max-width: 450px; }
+    #result-container { display: none; }
+    h1 { font-size: 22px; line-height: 1.5; }
+    p { line-height: 1.5; font-size: 14px; }
+    input[type="text"] { width: 80%; padding: 10px; margin-bottom: 15px; border: 2px solid #222; border-radius: 0; font-size: 12px; font-family: 'Cubic 11', 'Press Start 2P', cursive; background-color: #fefefe; }
+    input::placeholder { color: #888; font-size: 9px; }
+    button { background-color: #f39c12; color: #ffffff; padding: 12px 20px; border: 2px solid #222; border-radius: 0; cursor: pointer; font-size: 12px; font-family: 'Cubic 11', 'Press Start 2P', cursive; transition: none; }
+    button:hover, button:active { background-color: #e67e22; color: #ffff00; }
+
+    /* Message Area */
+    #code-message-area {
+      background-color: #2d2d2d; color: #00ff41;
+      font-family: 'Courier New', Courier, monospace; font-size: 14px;
+      text-align: left; padding: 15px; border: 2px solid #222;
+      min-height: 100px;
+      max-height: min(40vh, 260px);   
+      overflow-y: auto;               
+      overflow-x: hidden;             
+      line-height: 1.6; white-space: pre-wrap;
+      word-break: break-word;         
+      margin-bottom: 15px;
+      position: relative;             
+    }
+
+    #code-message-area::-webkit-scrollbar { width: 10px; }
+    #code-message-area::-webkit-scrollbar-track { background: #1f1f1f; }
+    #code-message-area::-webkit-scrollbar-thumb { background: #555; border-radius: 6px; }
+    #code-message-area::-webkit-scrollbar-thumb:hover { background: #777; }
+
+    .typing-cursor {
+      display: inline-block;
+      background-color: #00ff41;
+      width: 8px;
+      height: 1.1em;
+      margin-left: 1px;
+      vertical-align: baseline;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      from, to { background-color: transparent; }
+      50% { background-color: #00ff41; }
+    }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background-color: #fefefe; padding: 25px; border-radius: 0; border: 4px solid #222; text-align: center; box-shadow: 8px 8px 0px #222; width: 90%; max-width: 400px; }
+    .modal-content p { font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+    .modal-buttons button { padding: 15px 20px; display: block; width: 100%; margin: 0 0 10px 0; font-size: 10px; }
+    .modal-buttons button:last-child { margin-bottom: 0; }
+    #confirm-btn { background-color: #4a90e2; }
+    #confirm-btn:hover, #confirm-btn:active { background-color: #357abd; color: #ffff00; }
+    #cancel-btn { background-color: #f39c12; }
+    #cancel-btn:hover, #cancel-btn:active { background-color: #e67e22; color: #ffff00; }
+
+    @media (max-width: 500px) {
+      .container { width: 85%; padding: 15px; }
+      h1 { font-size: 18px; }
+      button { padding: 10px 15px; font-size: 11px; }
+      #code-message-area { font-size: 12px; min-height: 80px; }
+      .modal-content { padding: 20px; max-width: 90%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="input-container" class="container">
+    <h1>For Danny</h1>
+    <p>Please enter your name</p>
+    <input type="text" id="name-input" placeholder="e.g.Danny, Capitalize the first letter">
+    <button onclick="showMessage()">see message</button>
+  </div>
+
+  <div id="result-container" class="container">
+    <p>Message for you:</p>
+    <pre id="code-message-area"></pre>
+    <button onclick="resetToStart()">Happy Graduation !</button>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <p id="confirmation-text">This is a confirmation message</p>
+      <div class="modal-buttons">
+        <button id="confirm-btn" onclick="confirmName()">I've checked it out.</button>
+        <button id="cancel-btn" onclick="cancelConfirmation()">My bad. Let me start over.</button>
+      </div>
+    </div>
+  </div>
+
+  <script defer>
+    // --- Variables ---
+    const messages = {
+      'Danny': `嗨丹尼呀
+這個網站讓妳第一個玩！
+前一個版本有一點醜，我有努力改漂亮了（應該）
+原本後面我還有接一個打外星人遊戲但是那個要用電腦開，我猜妳應該會是用手機開這個網頁，啊為啥不做一個手機版的遊戲呢？因為我手機版的遊戲一直有bug來不及修了只好拿掉咧哈哈哈哈哈哈
+
+已經忘記是為什麼開始找妳聊天，我也根本不記得妳什麼時候進來的，感覺好像很久但好像根本沒有，我要說的是:
+在AsiaYo最後這段時間很感謝有妳的存在ㄛ！
+原本我真的只是在佛系找工作，但是聽到妳只到12月沒有要再續約，我就想說那我也12月走好了，不知道什麼鬼關聯但是我就覺得有被推一把哈哈哈哈哈（到底是誰推我），阿後來也面試很多間公司但都沒有中，結果10月有一天貴死突然跟我說妳要當毀約仔，我還覺得蛤蛤蛤完了去了要屎掉了，然後我就又爆投一波履歷，才找到了不管是薪水還是福利都感覺很不賴的工作，謝謝妳每天上班下班上課下課聽我講一堆廢話，對我來說妳絕對是個幸運小子！
+
+一直有一個感覺好像就算離開這裡，我們還是會再見面（誰說的），啊妳不要有壓力（啊不一起出來玩就揍妳喔），出去玩會記得避開妳期中考期末考的時候、讀paper的時候、學寫程式的時候、想休息的時候，不管未來怎麼樣，碩士唸兩年三年不重要，妳都要記得妳是一個很棒的人喔！
+
+臭小子畢業快樂ㄛ！
+台北市松山區敦化北路170號10樓->新公司地址
+吃不完的便當再麻煩了
+蓋瑞給妳帶來了提拉米蘇，他知道妳喜歡吃，所以想帶來給妳加油打氣，請說:謝謝蓋瑞
+
+長篇大論是我自己也想要試試看字數有沒有上限啦哈哈哈哈哈哈
+然後我發現一直盯著看字跑出來眼睛好像會很酸要記得眨眼睛喇
+૮ ⚆ﻌ⚆ა૮⚆ﻌ⚆ ა`
+    };
+
+    let currentName = '';
+    let inputContainer, nameInput, modalOverlay, confirmationText, resultContainer, codeMessageArea;
+    let typingInterval = null;
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        inputContainer = document.getElementById('input-container');
+        nameInput = document.getElementById('name-input');
+        modalOverlay = document.getElementById('modal-overlay');
+        confirmationText = document.getElementById('confirmation-text');
+        resultContainer = document.getElementById('result-container');
+        codeMessageArea = document.getElementById('code-message-area');
+
+        if (!inputContainer || !nameInput || !modalOverlay || !confirmationText || !resultContainer || !codeMessageArea) {
+          throw new Error("Critical UI elements missing!");
+        }
+      } catch (error) {
+        document.body.innerHTML = `<p style='color:red;'>Error: Init failed. ${error.message}</p>`;
+      }
+    });
+
+    // --- Screen Switching Functions ---
+    function showMessage() {
+      if (!nameInput || !confirmationText || !modalOverlay) return;
+      currentName = nameInput.value;
+      if (currentName.trim() === '') { alert('Please enter your name first！'); return; }
+      confirmationText.innerText = `Are you sure you are "${currentName}" ?`;
+      modalOverlay.style.display = 'flex';
+    }
+
+    function cancelConfirmation() {
+      if (modalOverlay) modalOverlay.style.display = 'none';
+    }
+
+    // --- Confirm & Typewriter ---
+    function confirmName() {
+      if (!codeMessageArea || !inputContainer || !resultContainer || !modalOverlay) {
+        alert("Error: Cannot display message.");
+        return;
+      }
+      cancelConfirmation(); // Close modal
+      const messageToShow = (currentName in messages) ? messages[currentName] : `Who are you ${currentName}? No message for you.`;
+
+      // Start typewriter
+      codeMessageArea.innerHTML = '';
+      typeMessage(messageToShow, codeMessageArea);
+
+      inputContainer.style.display = 'none';
+      resultContainer.style.display = 'block';
+    }
+
+    function typeMessage(message, element) {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+
+      let index = 0;
+      element.innerHTML = '<span class="typing-cursor"></span>';
+
+      typingInterval = setInterval(() => {
+        if (index < message.length) {
+          const cursorSpan = element.querySelector('.typing-cursor');
+          const charNode = document.createTextNode(message[index]);
+
+          if (cursorSpan) {
+            element.insertBefore(charNode, cursorSpan);
+          } else {
+            element.appendChild(charNode);
+          }
+
+          element.scrollTop = element.scrollHeight;
+
+          index++;
+        } else {
+          clearInterval(typingInterval);
+          typingInterval = null;
+          const cursorSpan = element.querySelector('.typing-cursor');
+          if (cursorSpan) cursorSpan.remove();
+        }
+      }, 80);
+    }
+
+    // --- Reset ---
+    function resetToStart() {
+      if (typingInterval) {
+        clearInterval(typingInterval);
+        typingInterval = null;
+      }
+      if (resultContainer) resultContainer.style.display = 'none';
+      if (modalOverlay) modalOverlay.style.display = 'none';
+      if (inputContainer) inputContainer.style.display = 'block';
+      if (nameInput) nameInput.value = '';
+      if (codeMessageArea) codeMessageArea.innerHTML = '';
+    }
+  </script>
+</body>
+</html>
