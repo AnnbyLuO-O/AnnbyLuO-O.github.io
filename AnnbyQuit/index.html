@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annby Quest · 交接小小知識庫</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    @font-face {
+      font-family: 'Cubic 11';
+      src: url('https://cdn.jsdelivr.net/npm/man-tout-font@1.0.1/font/MTC.woff2') format('woff2');
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 12px;
+      background: #c7f5c7;
+      background-image:
+        linear-gradient(#a6e3a1 2px, transparent 2px),
+        linear-gradient(90deg, #a6e3a1 2px, transparent 2px);
+      background-size: 32px 32px;
+      font-family: 'Cubic 11', 'Press Start 2P', system-ui, sans-serif;
+      color: #222;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .frame {
+      border: 4px solid #222;
+      box-shadow: 0 0 0 4px #ffffff, 0 0 0 8px #222;
+      background: #fdfefc;
+      width: 100%;
+      max-width: 1120px;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 24px); /* 12px 上下 padding → 24 */
+      overflow: hidden;           /* 裡面自己滾動 */
+    }
+
+    header {
+      padding: 16px;
+      border-bottom: 4px solid #222;
+      background: #f5ffe9;
+      flex-shrink: 0;
+    }
+
+    .title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 16px;
+      line-height: 1.4;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .main {
+      display: flex;
+      flex: 1;
+      min-height: 0; /* 讓內容區可以縮、裡面才會出現滾動 */
+    }
+
+    /* Sidebar */
+    #sidebar {
+      width: 220px;
+      border-right: 4px solid #222;
+      background: #e4ffe4;
+      padding: 12px;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-title {
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .category-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-family: 'Cubic 11';
+      font-size: 12px;
+      padding: 8px;
+      margin-bottom: 8px;
+      border: 3px solid #222;
+      background: #ffffff;
+      cursor: pointer;
+      text-transform: none;
+      box-shadow: 0 3px 0 #222;
+    }
+
+    .category-btn.active {
+      background: #9ae6b4;
+    }
+
+    .category-btn:active {
+      box-shadow: 0 0 0 #222;
+      transform: translateY(3px);
+    }
+
+    /* Content */
+    #content {
+      flex: 1;
+      padding: 14px;
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .search-box {
+      margin-bottom: 12px;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 8px 10px;
+      font-family: 'Cubic 11';
+      font-size: 12px;
+      border: 3px solid #222;
+      background: #fffffe;
+    }
+
+    .hint {
+      font-size: 10px;
+      margin-top: 4px;
+      opacity: 0.7;
+    }
+
+    #currentCategoryLabel {
+      margin: 12px 0 8px;
+      font-size: 12px;
+      border-bottom: 2px solid #222;
+      padding-bottom: 4px;
+    }
+
+    #itemList {
+      margin-top: 4px;
+    }
+
+    .item-card {
+      border: 3px solid #222;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #ffffff;
+    }
+
+    .item-title {
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+
+    .item-category {
+      font-size: 10px;
+      opacity: 0.7;
+      margin-bottom: 6px;
+    }
+
+    .item-desc {
+      font-size: 11px;
+      margin-bottom: 6px;
+      line-height: 1.4;
+      white-space: pre-line;
+    }
+
+    .item-links a {
+      display: inline-block;
+      font-size: 10px;
+      text-decoration: none;
+      border-bottom: 2px solid #222;
+      padding: 2px 4px;
+      margin: 2px 4px 0 0;
+      background: #f5ffe9;
+    }
+
+    .item-links a:hover {
+      background: #9ae6b4;
+    }
+
+    .empty {
+      font-size: 11px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .main {
+        flex-direction: column;
+      }
+      #sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 4px solid #222;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .category-btn {
+        width: calc(50% - 4px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <header>
+      <div class="title">ANNBY QUEST</div>
+      <div class="subtitle">
+        交接攻略本 · 用搜尋或左邊關卡分類找到對應表單 / 文件  
+      </div>
+    </header>
+
+    <div class="main">
+      <aside id="sidebar">
+        <div class="sidebar-title">關卡選擇 · CATEGORY</div>
+        <!-- 類別按鈕會由 JS 填入 -->
+      </aside>
+
+      <section id="content">
+        <div class="search-box">
+          <input id="searchInput" type="text" placeholder="輸入關鍵字搜尋（例如：Expedia、tag、富士山、FAQ…）">
+          <div class="hint">Tips：打字會即時篩選所有類別，清空則只看目前的類別。</div>
+        </div>
+
+        <div id="currentCategoryLabel"></div>
+        <div id="itemList"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    //  交接內容資料（可自行增加）
+    // =========================
+    const items = [
+      // ---- Accommodation ----
+      {
+        category: "Accommodation",
+        title: "提品表單（LINE OA 每月推播使用）",
+        desc: "固定提品活動：MKT 每月透過 LINE OA 推播時會用到的提品表單。",
+        links: [
+          {
+            label: "提品表單（Google Sheet）",
+            url: "https://docs.google.com/spreadsheets/d/1PTIWJ52tp9CgaHWvLlnYKjSJlANw4oyxSZz5vX6G-RA/edit?gid=2099003304#gid=2099003304"
+          }
+        ]
+      },
+      {
+        category: "Accommodation",
+        title: "Expedia 物件數量 / Region 資料 / 匯入日期＆結果",
+        desc: "追蹤 Expedia 物件量、各 Region 資訊與匯入結果的主表。",
+        links: [
+          {
+            label: "Expedia 物件數量＆匯入結果表",
+            url: "https://docs.google.com/spreadsheets/d/19H7f_7hd-rCARBeyFargbHQ57apDqYOT8pJBqt8W3tY/edit?gid=856971855#gid=856971855"
+          }
+        ]
+      },
+      {
+        category: "Accommodation",
+        title: "Expedia 各國 POI 匯入日期＆結果",
+        desc: "各國 POI 匯入時間與結果追蹤。",
+        links: [
+          {
+            label: "POI 匯入日期＆結果表",
+            url: "https://docs.google.com/spreadsheets/d/1d4z5nWqRi1pPcXG4CCOMbZvD0RAt_csXNyrzAbLBi8k/edit?gid=0#gid=0"
+          }
+        ]
+      },
+      {
+        category: "Accommodation",
+        title: "Property Tag 建置邏輯＆操作",
+        desc:
+`Tag 種類：
+1) property tag → 給搜尋頁使用，例如：寵物友善、青年旅館（有 icon & 多語系）
+2) campaign tag → 行銷管理活動，例如：雙十、中秋優惠（有藍色區塊 & 活動起訖日）
+
+Tagging list 填寫：
+1) on/off：建置完也要記得開啟
+2) Tag logo：複製 icon 名稱，例如：青年旅館 → "youth-hostel"
+3) 填入各語系名稱
+4) 描述可用 ChatGPT 生成
+
+New prog 建置 tag 步驟：
+1) 路徑：New prog → Tag Management → Create
+2) Tag Type：property tag
+3) Tag Name：例如 hostel
+4) Include Bnbs：貼入要套用的 bnbId（用逗號隔開、不能有空白）
+   可用線上工具把欄變成逗號分隔
+5) 建好後記得把「Enable」調整成 on`,
+        links: [
+          {
+            label: "Property tag 邏輯（Figma）",
+            url: "https://www.figma.com/board/TIHGfbEGgGION7x43cD9fm/Property-tag-%E5%84%AA%E5%8C%96---User-Story-Mapping?node-id=0-1&p=f&t=qILhcqnbcRvGhLVP-0"
+          },
+          {
+            label: "建置 tag 教學簡報",
+            url: "https://docs.google.com/presentation/d/1GQBOXjkC5wwrCWOmWpQmqWNJOAsiFW9zscezJC2UYhI/edit"
+          },
+          {
+            label: "Tagging list（要建新 tag 時填寫）",
+            url: "https://docs.google.com/spreadsheets/d/1MkVSjqOjFgVrgay02iD0LXbjH516b8PLUjoEF96dlQA/edit"
+          },
+          {
+            label: "Icon 圖示（zeroheight）",
+            url: "https://zeroheight.com/8ei12wwuw/p/506845-icons/b/8501ec"
+          },
+          {
+            label: "Column → Comma 線上工具",
+            url: "https://convert.town/column-to-comma-separated-list"
+          }
+        ]
+      },
+      {
+        category: "Accommodation",
+        title: "WIG 表單資料抓取（Tableau → Google Sheet）",
+        desc:
+`Overview：
+1) 右上角框框 → 交叉資料表（Crosstab）
+2) 下載成 CSV
+3) 匯入 Google Sheet 再做後續整理
+
+Orders：
+1) Column 勾選需要欄位（例如：bnb_country / channel manager / affiliate group）
+2) Booking status → 選 accepted
+3) Date Range → Last Week（每週更新用）`,
+        links: [
+          {
+            label: "WIG Overview（Tableau）",
+            url: "https://prod-apnortheast-a.online.tableau.com/#/site/asiayobi/views/ProjectY/Overview/973ec726-ad40-4f28-b1f7-0c01501fe1fe/340d3c9d-05fb-4eff-b6ea-334bf0f4b804?:iid=1"
+          },
+          {
+            label: "Properties Orders（Tableau）",
+            url: "https://prod-apnortheast-a.online.tableau.com/#/site/asiayobi/views/Properties_production/orders?:iid=1"
+          }
+        ]
+      },
+      {
+        category: "Accommodation",
+        title: "POI 涵蓋的 bnb 數量（最新 2025/04/01）",
+        desc: "POI 覆蓋率相關議題與最新 bnb 數量更新，細節請看聊天室 thread。",
+        links: [
+          {
+            label: "POI 涵蓋 bnb 數量 ISSUE（Google Chat）",
+            url: "https://chat.google.com/room/AAAAR3hMHLw/ss2LChEd8Gk/xW3-qRK-A50?cls=10"
+          }
+        ]
+      },
+      {
+        category: "Accommodation",
+        title: "Project Y Info Update 注意事項",
+        desc:
+`1) 成功同步旅宿但無法對應到區域：
+   → 複查並確認地區設定是否有誤（region 設定錯誤）。
+
+2) 成功同步旅宿但區域有變更且已下架：
+   → 複查即可，確認為區域調整導致。
+
+3) 同步失敗：
+   → 通常是電話號碼格式或內容有誤，修正電話後重新同步。
+
+4) 已下架但尚有未入住訂單：
+   → 通知 CS 以及該國家負責的 team 做後續處理。
+
+如有其他錯誤狀況，直接在 product-help 發問。`,
+        links: []
+      },
+
+      // ---- SEB 登山 ----
+      {
+        category: "SEB登山",
+        title: "富士山小知識簡報",
+        desc: "給客人或內部同仁快速理解富士山登山相關小知識用的簡報。",
+        links: [
+          {
+            label: "富士山小知識（簡報）",
+            url: "https://docs.google.com/presentation/d/1AiDAjCYhw9RKJnfh8oAHCqtg3OPuv2P_0qFA2QGhJak/edit?slide=id.p#slide=id.p"
+          }
+        ]
+      },
+      {
+        category: "SEB登山",
+        title: "富士山所有商品＆上載資料總表",
+        desc: "所有富士山相關商品與上架資料彙整，用來確認產品狀態、售價、方案內容等。",
+        links: [
+          {
+            label: "富士山商品＆上載資料（Google Sheet）",
+            url: "https://docs.google.com/spreadsheets/d/19IzSJ_F5PnZ5F3koSApVFcSs_XNh4BHEQK7K4NBG5C8/edit?gid=327023623#gid=327023623"
+          }
+        ]
+      },
+      {
+        category: "SEB登山",
+        title: "SEB Canva 設計檔",
+        desc: "SEB 相關行銷素材、版型設計檔，需編輯圖片或版面時使用。",
+        links: [
+          {
+            label: "SEB Canva 專案",
+            url: "https://www.canva.com/design/DAFuTe1uLDY/Wbh0uGRzR6_ymXGMK8E79w/edit"
+          }
+        ]
+      },
+      {
+        category: "SEB登山",
+        title: "SEB 結帳明細 / 對帳表",
+        desc: "SEB 訂單結帳用表單，包含金額與對帳資訊。",
+        links: [
+          {
+            label: "SEB 結帳（Google Sheet）",
+            url: "https://docs.google.com/spreadsheets/d/1CVBw0_8pkiKhmGUgYBrBuf_iKwWI87TgGoIIM2vvKAM/edit?gid=0#gid=0"
+          }
+        ]
+      },
+      {
+        category: "SEB登山",
+        title: "SEB 簡訊發送後台",
+        desc: "發送 SEB 相關簡訊通知（行前通知等）所使用的 Infobip 後台。",
+        links: [
+          {
+            label: "Infobip 簡訊後台",
+            url: "https://portal.infobip.com/login?code=794ef006-fc55-4cfd-a3a2-fa1e3a130743"
+          }
+        ]
+      },
+      {
+        category: "SEB登山",
+        title: "SEB 成本價 / 賣價計算草稿表",
+        desc: "試算 SEB 商品成本與賣價的草稿表，可作為定價或調整參考。",
+        links: [
+          {
+            label: "成本 / 賣價草稿（Google Sheet）",
+            url: "https://docs.google.com/spreadsheets/d/1njJXm8wjpXV3ZrGGSQ_V7NO4JtSv4LmH7CnZDRhlACU/edit?gid=0#gid=0"
+          }
+        ]
+      },
+      {
+        category: "SEB登山",
+        title: "SEB 臉書發文範本（Annby 未實際發過）",
+        desc: "SEB 相關臉書貼文的文案範本，之後排程發文可直接參考修改。",
+        links: [
+          {
+            label: "SEB 臉書發文範本（Google Doc）",
+            url: "https://docs.google.com/document/d/1yAF7wXPkpiQjRZjJLegnoAFLo6rWJY8DhQwcfB2M9jQ/edit?tab=t.0"
+          }
+        ]
+      },
+
+      // ---- AI BOT ----
+      {
+        category: "AI BOT",
+        title: "FAQ 整理總表",
+        desc: "AI Bot 相關 FAQ 整理用的主表，用來彙整問答內容。",
+        links: [
+          {
+            label: "FAQ 整理（Google Sheet）",
+            url: "https://docs.google.com/spreadsheets/d/1l6PT8lmukghwpZvqZNRwCkOgjAovTQN-sjyW6hcaWzg/edit?gid=0#gid=0"
+          }
+        ]
+      },
+      {
+        category: "AI BOT",
+        title: "Chat 裡的 FAQ（Annby 整理 / 分類）",
+        desc: "從 Chat 紀錄中整理出的 FAQ，已由 Annby 做分類歸納，可作為訓練或回覆參考。",
+        links: [
+          {
+            label: "Chat FAQ 整理（Google Sheet）",
+            url: "https://docs.google.com/spreadsheets/d/1il5H305qBuCIKg_rlczE3xuyQ65J5d6CENomql0Bq-c/edit?gid=0#gid=0"
+          }
+        ]
+      },
+
+      // ---- 其他 ----
+      {
+        category: "其他",
+        title: "零食許願表單",
+        desc: "公司零食許願清單，用來蒐集大家想吃的零食。",
+        links: [
+          {
+            label: "零食許願（Google Sheet）",
+            url: "https://docs.google.com/spreadsheets/d/1rmKUTGwX5nvYFsR3jqPED_nWS0b4exqmwFS9b1hhpu0/edit?gid=1895283187#gid=1895283187"
+          }
+        ]
+      },
+      {
+        category: "其他",
+        title: "Product-Help 發問流程說明",
+        desc: "如何在 product-help 正確發問、需要提供哪些資訊的流程說明文件。",
+        links: [
+          {
+            label: "Product-Help 發問流程（Google Doc）",
+            url: "https://docs.google.com/document/d/1p1EFI-MmUgzi02JnWqQnwjD8XM-JIUzdz8U8ILYOlSE/edit?tab=t.0#heading=h.m8u27qmgye1v"
+          }
+        ]
+      },
+      {
+        category: "其他",
+        title: "公司人員組織架構表",
+        desc: "公司整體組織架構與人員名單，查詢各部門負責人／窗口時使用。",
+        links: [
+          {
+            label: "公司人員組織架構（Google Sheet）",
+            url: "https://docs.google.com/spreadsheets/d/1sGaKZR-5_fsniBaa2IE19qgotRFOllu_wKvAbEDOgao/edit?gid=1508727322#gid=1508727322"
+          }
+        ]
+      },
+      {
+        category: "其他",
+        title: "AsiaYo 後台操作說明",
+        desc: "AsiaYo 自家後台的基本操作與流程說明，給新同事熟悉系統用。",
+        links: [
+          {
+            label: "後台操作說明（Google Doc）",
+            url: "https://docs.google.com/document/d/1VsyE78DRoll1Pey8CGcssYk2cP0x4RnVYl2wqsm_Ha0/edit?tab=t.0#heading=h.t56dr71o0wgy"
+          }
+        ]
+      }
+    ];
+
+    // =========================
+    //  UI 渲染邏輯
+    // =========================
+    const sidebarEl = document.getElementById("sidebar");
+    const itemListEl = document.getElementById("itemList");
+    const searchInputEl = document.getElementById("searchInput");
+    const currentCategoryLabelEl = document.getElementById("currentCategoryLabel");
+
+    const categories = Array.from(new Set(items.map(i => i.category)));
+    let currentCategory = categories[0] || null;
+
+    function renderSidebar() {
+      categories.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.className = "category-btn";
+        if (cat === currentCategory) btn.classList.add("active");
+        btn.textContent = cat;
+        btn.addEventListener("click", () => {
+          currentCategory = cat;
+          searchInputEl.value = ""; // 清空搜尋
+          updateActiveButtons();
+          renderList();
+        });
+        sidebarEl.appendChild(btn);
+      });
+    }
+
+    function updateActiveButtons() {
+      const buttons = sidebarEl.querySelectorAll(".category-btn");
+      buttons.forEach(btn => {
+        if (btn.textContent === currentCategory) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+    }
+
+    function renderList() {
+      const keyword = searchInputEl.value.trim().toLowerCase();
+      let filtered = items;
+
+      if (keyword) {
+        filtered = items.filter(i =>
+          i.title.toLowerCase().includes(keyword) ||
+          i.desc.toLowerCase().includes(keyword) ||
+          i.category.toLowerCase().includes(keyword)
+        );
+        currentCategoryLabelEl.textContent = `搜尋結果 · "${keyword}"`;
+      } else if (currentCategory) {
+        filtered = items.filter(i => i.category === currentCategory);
+        currentCategoryLabelEl.textContent = `目前類別 · ${currentCategory}`;
+      } else {
+        currentCategoryLabelEl.textContent = "";
+      }
+
+      itemListEl.innerHTML = "";
+
+      if (!filtered.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "沒有找到結果，可以換個關鍵字試試。";
+        itemListEl.appendChild(empty);
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "item-card";
+
+        const title = document.createElement("div");
+        title.className = "item-title";
+        title.textContent = item.title;
+
+        const cat = document.createElement("div");
+        cat.className = "item-category";
+        cat.textContent = `Category：${item.category}`;
+
+        const desc = document.createElement("div");
+        desc.className = "item-desc";
+        desc.textContent = item.desc;
+
+        const links = document.createElement("div");
+        links.className = "item-links";
+        (item.links || []).forEach(link => {
+          const a = document.createElement("a");
+          a.href = link.url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.textContent = link.label;
+          links.appendChild(a);
+        });
+
+        card.appendChild(title);
+        card.appendChild(cat);
+        card.appendChild(desc);
+        if ((item.links || []).length) {
+          card.appendChild(links);
+        }
+
+        itemListEl.appendChild(card);
+      });
+    }
+
+    // 搜尋即時更新
+    searchInputEl.addEventListener("input", () => {
+      renderList();
+    });
+
+    // 初始化
+    renderSidebar();
+    renderList();
+  </script>
+</body>
+</html>
