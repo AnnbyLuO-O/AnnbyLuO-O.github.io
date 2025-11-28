@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>\感恩叩謝Captain Ariel/</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    @font-face { font-family: 'Cubic 11'; src: url('https://cdn.jsdelivr.net/npm/man-tout-font@1.0.1/font/MTC.woff2') format('woff2'); }
+
+    /* 黃 */
+    body { 
+      font-family: 'Cubic 11', 'Press Start 2P', cursive; 
+      background-color: #fff8cc;      
+      color: #333; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      margin: 0; 
+      overflow: hidden; 
+      image-rendering: pixelated; 
+    }
+
+    .container { 
+      position: relative; 
+      text-align: center; 
+      background-color: #fffbea;         
+      padding: 30px; 
+      border-radius: 0; 
+      border: 4px solid #444; 
+      box-shadow: 8px 8px 0px #c49a00;   
+      width: 90%; 
+      max-width: 450px; 
+    }
+
+    #result-container { display: none; }
+    h1 { font-size: 22px; line-height: 1.5; color: #a37200; }  
+    p { line-height: 1.5; font-size: 14px; }
+
+    input[type="text"] { 
+      width: 80%; 
+      padding: 10px; 
+      margin-bottom: 15px; 
+      border: 2px solid #c49a00; 
+      border-radius: 0; 
+      font-size: 12px; 
+      font-family: 'Cubic 11', 'Press Start 2P', cursive; 
+      background-color: #fffdee; 
+      color: #333;
+    }
+    input::placeholder { color: #b7a36d; font-size: 9px; }
+
+    button { 
+      background-color: #f1c232; 
+      color: #222; 
+      padding: 12px 20px; 
+      border: 2px solid #444; 
+      border-radius: 0; 
+      cursor: pointer; 
+      font-size: 12px; 
+      font-family: 'Cubic 11', 'Press Start 2P', cursive; 
+      transition: none; 
+    }
+    button:hover, button:active { background-color: #ffd966; color: #000; }
+
+    
+    #code-message-area {
+      background-color: #2d2d2d; 
+      color: #ffe600;              
+      font-family: 'Courier New', Courier, monospace; 
+      font-size: 14px;
+      text-align: left; 
+      padding: 15px; 
+      border: 2px solid #444;
+      min-height: 100px;
+      max-height: min(40vh, 260px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      line-height: 1.6; 
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    
+    #code-message-area::-webkit-scrollbar { width: 10px; }
+    #code-message-area::-webkit-scrollbar-track { background: #3e3e3e; }
+    #code-message-area::-webkit-scrollbar-thumb { background: #c49a00; border-radius: 6px; }
+    #code-message-area::-webkit-scrollbar-thumb:hover { background: #ffd966; }
+
+    
+    .typing-cursor {
+      display: inline-block;
+      background-color: #ffe600;
+      width: 8px;
+      height: 1.1em;
+      margin-left: 1px;
+      vertical-align: baseline;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      from, to { background-color: transparent; }
+      50% { background-color: #ffe600; }
+    }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content { background-color: #fff9db; padding: 25px; border-radius: 0; border: 4px solid #444; text-align: center; box-shadow: 8px 8px 0px #c49a00; width: 90%; max-width: 400px; }
+    .modal-content p { font-size: 14px; margin-bottom: 25px; line-height: 1.5; color: #6b5500; }
+    .modal-buttons button { padding: 15px 20px; display: block; width: 100%; margin: 0 0 10px 0; font-size: 10px; }
+    #confirm-btn { background-color: #f1c232; }
+    #confirm-btn:hover, #confirm-btn:active { background-color: #ffd966; color: #000; }
+    #cancel-btn { background-color: #f6b26b; }
+    #cancel-btn:hover, #cancel-btn:active { background-color: #e69138; color: #000; }
+
+    @media (max-width: 500px) {
+      .container { width: 85%; padding: 15px; }
+      h1 { font-size: 18px; }
+      button { padding: 10px 15px; font-size: 11px; }
+      #code-message-area { font-size: 12px; min-height: 80px; }
+      .modal-content { padding: 20px; max-width: 90%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="input-container" class="container">
+    <h1>For Ariel</h1>
+    <p>Please enter your name</p>
+    <input type="text" id="name-input" placeholder="e.g.Ariel, Capitalize the first letter">
+    <button onclick="showMessage()">see message</button>
+  </div>
+
+  <div id="result-container" class="container">
+    <p>Message for you:</p>
+    <pre id="code-message-area"></pre>
+    <button onclick="resetToStart()">Best regards !</button>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <p id="confirmation-text">This is a confirmation message</p>
+      <div class="modal-buttons">
+        <button id="confirm-btn" onclick="confirmName()">I've checked it out.</button>
+        <button id="cancel-btn" onclick="cancelConfirmation()">My bad. Let me start over.</button>
+      </div>
+    </div>
+  </div>
+
+  <script defer>
+    const messages = {
+      'Ariel': `您好呀ariel~~~~ 
+那個...信有點長喔妳要記得眨眼睛不然眼睛會花掉૮ ⚆ﻌ⚆ა
+原諒我嘴巴很笨(不管是要說再見還是講一些正經話的)，我自己對於很突然地提離職仍然感到很抱歉，但還是有一些話想要對妳說的呦 !
+以前我總會跟朋友說，沒有在蝦皮轉正好像是這輩子做過最壞的決定，因為離開那裡之後的每一天我都過得很痛苦，後來經過momo跟山富，一直覺得人生該不會就這樣子了吧，我是一直到2022年我爸過世我才終於又想通了一些事，然後也是那一年被Ariel妳打撈上岸的 !
+我還記得跟妳面試的畫面，那時候不管我講了什麼，妳好像都很打從心底認同，然後也一直是笑臉(就算只是主管面試的伎倆，對那時候的我來說真的是一種安慰呢哈哈哈哈哈哈哈)，我打從心底就覺得: 「嗯! 我要當妳的小隊員，我要加入Ariel戰隊 ! 」，後來就算HR覺得我不適合，也還是被妳敗部復活了，可喜可賀 !
+不知道妳還記不記得以前在上載我有因為秋西的管理方式提了一次離職哈哈哈哈哈，那時候妳對我說: 「我知道你以前遇到問題就會逃走，但我希望你在這裡可以學會解決問題，不然很可惜 !」，這句話在後來遇到很多很多問題的時候都會冒出來(這間公司問題就真的很多)。
+這一兩年，BO總是被公司一些很白癡的決策搞得烏煙瘴氣的，但是我已經不知道跟大家講過幾百次， 「要不是因為妳是我主管，我才不會繼續待在這裡咧 !」，真的是幾百次起跳喔 ! 
+新的公司面試的時候有問到我: 「會最捨不得AsiaYo的什麼事情?」我大概有想兩秒才說: 「應該是主管吧。」是妳才讓我知道人跟人之間可以單純基於信任而說實話，有任何問題都可以直接跟妳說，有不知道的事情也可以完全沒有壓力直接問，單純想要閒聊也可以直接開聊。
+在這邊的我真的過得非常開心，也覺得被姊姊們照顧得很好，只是呀~就感覺這樣下去不是辦法，我也想要試試看做更厲害的事賺更多錢去學會更多技能，糾結了真的很久很久很久才做了這個決定，真的很謝謝Ariel，也謝謝大家 !
+
+P.S.我會告訴新公司的人我是有娘家可以回的人 !`
+    };
+
+    let currentName = '';
+    let typingInterval = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      inputContainer = document.getElementById('input-container');
+      nameInput = document.getElementById('name-input');
+      modalOverlay = document.getElementById('modal-overlay');
+      confirmationText = document.getElementById('confirmation-text');
+      resultContainer = document.getElementById('result-container');
+      codeMessageArea = document.getElementById('code-message-area');
+    });
+
+    function showMessage() {
+      currentName = nameInput.value;
+      if (currentName.trim() === '') { alert('Please enter your name first！'); return; }
+      confirmationText.innerText = `Are you sure you are "${currentName}" ?`;
+      modalOverlay.style.display = 'flex';
+    }
+
+    function cancelConfirmation() {
+      modalOverlay.style.display = 'none';
+    }
+
+    function confirmName() {
+      modalOverlay.style.display = 'none';
+      const messageToShow = (currentName in messages) ? messages[currentName] : `Who are you ${currentName}? No message for you.`;
+      codeMessageArea.innerHTML = '';
+      typeMessage(messageToShow, codeMessageArea);
+      inputContainer.style.display = 'none';
+      resultContainer.style.display = 'block';
+    }
+
+    function typeMessage(message, element) {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      let index = 0;
+      element.innerHTML = '<span class="typing-cursor"></span>';
+      typingInterval = setInterval(() => {
+        if (index < message.length) {
+          const cursorSpan = element.querySelector('.typing-cursor');
+          const charNode = document.createTextNode(message[index]);
+          if (cursorSpan) element.insertBefore(charNode, cursorSpan);
+          element.scrollTop = element.scrollHeight;
+          index++;
+        } else {
+          clearInterval(typingInterval);
+          typingInterval = null;
+          element.querySelector('.typing-cursor').remove();
+        }
+      }, 80);
+    }
+
+    function resetToStart() {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      resultContainer.style.display = 'none';
+      inputContainer.style.display = 'block';
+      nameInput.value = '';
+      codeMessageArea.innerHTML = '';
+    }
+  </script>
+</body>
+</html>

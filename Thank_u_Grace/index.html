@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>\謝謝安貴飛的貴/</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    @font-face { 
+      font-family: 'Cubic 11'; 
+      src: url('https://cdn.jsdelivr.net/npm/man-tout-font@1.0.1/font/MTC.woff2') format('woff2'); 
+    }
+
+
+    body { 
+      font-family: 'Cubic 11','Press Start 2P',cursive; 
+      background-color: #dcdcdc;      
+      color: #222; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      margin: 0; 
+      overflow: hidden; 
+      image-rendering: pixelated;
+    }
+
+    .container { 
+      position: relative; 
+      text-align: center; 
+      background-color: #efefef;      
+      padding: 30px; 
+      border-radius: 0; 
+      border: 4px solid #c2c2c2;      
+      box-shadow: 8px 8px 0px #b5b5b5;   
+      width: 90%; 
+      max-width: 450px; 
+    }
+
+    #result-container { display: none; }
+    h1 { font-size: 22px; color: #333; }
+    p { line-height: 1.5; font-size: 14px; color: #444; }
+
+    input[type="text"] { 
+      width: 80%; 
+      padding: 10px; 
+      margin-bottom: 15px; 
+      border: 2px solid #bdbdbd; 
+      background-color: #f7f7f7; 
+      color: #222;
+      border-radius: 0; 
+      font-size: 12px; 
+      font-family: 'Cubic 11','Press Start 2P',cursive;
+    }
+    input::placeholder { color: #888; font-size: 9px; }
+
+    button { 
+      background-color: #cfcfcf; 
+      color: #222; 
+      padding: 12px 20px; 
+      border: 2px solid #a8a8a8; 
+      cursor: pointer; 
+      font-size: 12px; 
+      font-family: 'Cubic 11','Press Start 2P',cursive; 
+      transition: 0.1s; 
+    }
+    button:hover { 
+      background-color: #b9b9b9; 
+    }
+
+    /* Typing box */
+    #code-message-area {
+      background-color: #333; 
+      color: #00ff95;             
+      font-family: "Courier New", monospace;
+      font-size: 14px;
+      text-align: left; 
+      padding: 15px; 
+      border: 2px solid #a8a8a8;
+      min-height: 100px;
+      max-height: min(40vh,260px);
+      overflow-y: auto;
+      line-height: 1.6; 
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    #code-message-area::-webkit-scrollbar { width: 10px; }
+    #code-message-area::-webkit-scrollbar-track { background: #d0d0d0; }
+    #code-message-area::-webkit-scrollbar-thumb { background: #a0a0a0; }
+    #code-message-area::-webkit-scrollbar-thumb:hover { background: #8a8a8a; }
+
+    .typing-cursor {
+      display: inline-block;
+      background-color: #00ff95;
+      width: 8px;
+      height: 1.1em;
+      margin-left: 1px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      from, to { background-color: transparent; }
+      50% { background-color: #00ff95; }
+    }
+
+    /* Modal */
+    .modal-overlay { 
+      position: fixed; top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      background-color: rgba(0,0,0,0.4); 
+      display: none; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 1000; 
+    }
+    .modal-content { 
+      background-color: #efefef;
+      padding: 25px; 
+      border: 4px solid #c2c2c2; 
+      box-shadow: 8px 8px 0px #b5b5b5;
+      text-align: center; 
+      width: 90%; 
+      max-width: 400px; 
+    }
+
+    .modal-content p { 
+      font-size: 14px; 
+      margin-bottom: 25px; 
+      color: #333; 
+    }
+
+    .modal-buttons button { 
+      display: block; 
+      width: 100%;
+      padding: 15px 20px; 
+      margin-bottom: 10px;
+      font-size: 10px;
+      background-color: #d8d8d8;
+      border-color: #b0b0b0;
+      color: #222;
+    }
+
+    #confirm-btn:hover { background:#c4c4c4; }
+    #cancel-btn:hover { background:#c4c4c4; }
+
+    @media (max-width: 500px) {
+      .container { width:85%; padding:15px; }
+      h1 { font-size:18px; }
+      #code-message-area { font-size:12px; min-height:80px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="input-container" class="container">
+    <h1>For Grace</h1>
+    <p>Please enter your name</p>
+    <input type="text" id="name-input" placeholder="e.g.Grace, Capitalize the first letter">
+    <button onclick="showMessage()">see message</button>
+  </div>
+
+  <div id="result-container" class="container">
+    <p>Message for you:</p>
+    <pre id="code-message-area"></pre>
+    <button onclick="resetToStart()">Best regards !</button>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <p id="confirmation-text">This is a confirmation message</p>
+      <div class="modal-buttons">
+        <button id="confirm-btn" onclick="confirmName()">I've checked it out.</button>
+        <button id="cancel-btn" onclick="cancelConfirmation()">My bad. Let me start over.</button>
+      </div>
+    </div>
+  </div>
+
+  <script defer>
+    const messages = {
+      'Grace': `您好呀丹尼的師父,貴死哈哈哈哈哈哈
+雖然說離開AY之後我們一定還會見面，但以後就不能一起上班了，所以有一些話還是要讓妳知道喇，畢竟你也知道我的嘴巴很笨，要講一些正經的就是講不太好。
+
+這是妳在這裡的第一年，也是我在這裡的一些年，有一陣子我總是在抱怨公司的制度，我記得有一天還在辦公室聊到很晚(好像還有桑妮，忘記有沒有Fion? ，那時候我還沒有更新履歷、還沒有想好要不要開始找工作，但是就是一邊上班一邊家教一邊很想離職，那個時候妳們兩個拉了我一把喔 (想不到吧) !雖然我很常耍白痴，但對於自己很多事情其實一直都沒什麼信心，謝謝在那段時間告訴我我其實很棒、其實要對自己有自信，雖然我回話都很白爛但我都有放在心上喔 !
+
+然後後來就是太謝謝妳跟Fion了，因為後來大家可能是變太熟了，總是有點我行我素很麻煩，謝謝妳們會願意聽我講一些廢話，一起想辦法，然後一起生氣，再一起解決。
+
+阿阿阿阿最重要的是，謝謝妳把要被淘汰的丹尼撈起來一起玩哈哈哈哈哈哈哈哈哈哈(最喜歡了)，雖然我也還不知道以後可以怎麼辦，但就是很喜歡跟妳們一起出去玩，要 一 起 去 露 營 !
+
+謝謝在AY的最後一年可以認識妳，謝謝妳剛好在離BO很近的Camping team !
+
+要 一 起 去 露 營 要 一 起 去 露 營 要 一 起 去 露 營
+ʕ　·ᴥʔ   ʕ·ᴥ·ʔʕ·ᴥ·ʔʕ·ᴥ·ʔ   ʕᴥ·　ʔ   `
+    };
+
+    let currentName = '';
+    let typingInterval = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      inputContainer = document.getElementById('input-container');
+      nameInput = document.getElementById('name-input');
+      modalOverlay = document.getElementById('modal-overlay');
+      confirmationText = document.getElementById('confirmation-text');
+      resultContainer = document.getElementById('result-container');
+      codeMessageArea = document.getElementById('code-message-area');
+    });
+
+    function showMessage() {
+      currentName = nameInput.value;
+      if (currentName.trim() === '') { alert('Please enter your name first！'); return; }
+      confirmationText.innerText = `Are you sure you are "${currentName}" ?`;
+      modalOverlay.style.display = 'flex';
+    }
+
+    function cancelConfirmation() {
+      modalOverlay.style.display = 'none';
+    }
+
+    function confirmName() {
+      modalOverlay.style.display = 'none';
+      const messageToShow = (currentName in messages) ? messages[currentName] : `Who are you ${currentName}? No message for you.`;
+      codeMessageArea.innerHTML = '';
+      typeMessage(messageToShow, codeMessageArea);
+      inputContainer.style.display = 'none';
+      resultContainer.style.display = 'block';
+    }
+
+    function typeMessage(message, element) {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      let index = 0;
+      element.innerHTML = '<span class="typing-cursor"></span>';
+      typingInterval = setInterval(() => {
+        if (index < message.length) {
+          const cursorSpan = element.querySelector('.typing-cursor');
+          const charNode = document.createTextNode(message[index]);
+          if (cursorSpan) element.insertBefore(charNode, cursorSpan);
+          element.scrollTop = element.scrollHeight;
+          index++;
+        } else {
+          clearInterval(typingInterval);
+          typingInterval = null;
+          element.querySelector('.typing-cursor').remove();
+        }
+      }, 80);
+    }
+
+    function resetToStart() {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      resultContainer.style.display = 'none';
+      inputContainer.style.display = 'block';
+      nameInput.value = '';
+      codeMessageArea.innerHTML = '';
+    }
+  </script>
+</body>
+</html>

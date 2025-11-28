@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>\謝謝桑妮/</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    @font-face { font-family: 'Cubic 11'; src: url('https://cdn.jsdelivr.net/npm/man-tout-font@1.0.1/font/MTC.woff2') format('woff2'); }
+
+    
+    body {
+      font-family: 'Cubic 11', 'Press Start 2P', cursive;
+      background-color: #ffeef4;     
+      color: #4b2e31;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      image-rendering: pixelated;
+    }
+
+    .container {
+      position: relative;
+      text-align: center;
+      background-color: #fff6fa;      
+      padding: 30px;
+      border-radius: 0;
+      border: 4px solid #5a3d42;      
+      box-shadow: 8px 8px 0px #d38ca5; 
+      width: 90%;
+      max-width: 450px;
+    }
+
+    #result-container { display: none; }
+
+    h1 { font-size: 22px; line-height: 1.5; color: #b05a6f; }
+    p { line-height: 1.5; font-size: 14px; }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 2px solid #d38ca5;     
+      background-color: #fff0f6;
+      color: #4b2e31;
+      font-size: 12px;
+      border-radius: 0;
+      font-family: 'Cubic 11', 'Press Start 2P', cursive;
+    }
+    input::placeholder {
+      color: #b88997;
+      font-size: 9px;
+    }
+
+    button {
+      background-color: #eb8aa7;     
+      color: #ffffff;
+      padding: 12px 20px;
+      border: 2px solid #5a3d42;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'Cubic 11', 'Press Start 2P', cursive;
+      transition: none;
+    }
+    button:hover, button:active {
+      background-color: #f5a7c1;
+      color: #4b2e31;
+    }
+
+    
+    #code-message-area {
+      background-color: #2d2d2d;
+      color: #ffb3d6;     
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      text-align: left;
+      padding: 15px;
+      border: 2px solid #5a3d42;
+      min-height: 100px;
+      max-height: min(40vh, 260px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    
+    #code-message-area::-webkit-scrollbar { width: 10px; }
+    #code-message-area::-webkit-scrollbar-track { background: #4b3a41; }
+    #code-message-area::-webkit-scrollbar-thumb {
+      background: #d38ca5;
+      border-radius: 6px;
+    }
+    #code-message-area::-webkit-scrollbar-thumb:hover {
+      background: #f5a7c1;
+    }
+
+    
+    .typing-cursor {
+      display: inline-block;
+      background-color: #ffb3d6;
+      width: 8px;
+      height: 1.1em;
+      margin-left: 1px;
+      vertical-align: baseline;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      from, to { background-color: transparent; }
+      50% { background-color: #ffb3d6; }
+    }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: none; justify-content: center; align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background-color: #ffe6ef;     
+      padding: 25px;
+      border-radius: 0;
+      border: 4px solid #5a3d42;
+      text-align: center;
+      box-shadow: 8px 8px 0px #d38ca5;
+      width: 90%; max-width: 400px;
+    }
+    .modal-content p {
+      font-size: 14px;
+      margin-bottom: 25px;
+      line-height: 1.5;
+      color: #6b4a52;
+    }
+
+    .modal-buttons button {
+      padding: 15px 20px;
+      display: block;
+      width: 100%;
+      margin: 0 0 10px 0;
+      font-size: 10px;
+    }
+
+    #confirm-btn {
+      background-color: #eb8aa7;
+      color: #fff;
+    }
+    #confirm-btn:hover, #confirm-btn:active {
+      background-color: #f5a7c1;
+      color: #4b2e31;
+    }
+
+    #cancel-btn {
+      background-color: #f4b089;
+      color: #4b2e31;
+    }
+    #cancel-btn:hover, #cancel-btn:active {
+      background-color: #ffc49c;
+      color: #4b2e31;
+    }
+
+    @media (max-width: 500px) {
+      .container { width: 85%; padding: 15px; }
+      h1 { font-size: 18px; }
+      button { padding: 10px 15px; font-size: 11px; }
+      #code-message-area { font-size: 12px; min-height: 80px; }
+      .modal-content { padding: 20px; max-width: 90%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="input-container" class="container">
+    <h1>For Sunnie</h1>
+    <p>Please enter your name</p>
+    <input type="text" id="name-input" placeholder="e.g.Sunnie, Capitalize the first letter">
+    <button onclick="showMessage()">see message</button>
+  </div>
+
+  <div id="result-container" class="container">
+    <p>Message for you:</p>
+    <pre id="code-message-area"></pre>
+    <button onclick="resetToStart()">Best regards !</button>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <p id="confirmation-text">This is a confirmation message</p>
+      <div class="modal-buttons">
+        <button id="confirm-btn" onclick="confirmName()">I've checked it out.</button>
+        <button id="cancel-btn" onclick="cancelConfirmation()">My bad. Let me start over.</button>
+      </div>
+    </div>
+  </div>
+
+  <script defer>
+    const messages = {
+      'Sunnie': `嗨~桑妮 早安 
+今天到公司了嗎 外面天氣好嗎✿✿✿
+等妳看到卡片的時候我已經在新的公司上班咧，光想到就有點害怕，
+謝謝AsiaYo讓我們遇見，謝謝是一起待在BO。
+
+其實這一次會這麼突然說離職也是有點誤打誤撞，畢竟一開始我真的就是想要試試水溫，沒有想到對方會給我好像很不錯的待遇(雖然說是不是地獄我自己也不確定)，就像之前午餐路上我講的，我其實很捨不得這裡的。
+
+還記得有一陣子我非常迷惘，那時候一邊家教一邊上班一邊很想離職，那時候下班跟妳們聊到很晚，謝謝妳告訴我不管到幾歲人都會很迷惘、告訴我我是一個很棒的人、告訴我我其實懂很多事情。平常我可能就是很會耍笨耍蠢，但其實對於自己的事情一直沒有什麼自信，但那時候講的話又讓我多撐了一陣子，謝謝妳。
+
+在工作上可以遇到一起聊天的前輩對我來說是幸運的，畢竟以前的經歷讓我對職場遇到的人一直都蠻害怕的，謝謝BO有妳們幾個姊姊，真的很喜歡妳們喔 !
+
+等我可以遠端，我會回來的ʕ·ᴥ·ʔ
+P.S.以後中午要記得吃飯喔 !
+`
+    };
+
+    let currentName = '';
+    let typingInterval = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      inputContainer = document.getElementById('input-container');
+      nameInput = document.getElementById('name-input');
+      modalOverlay = document.getElementById('modal-overlay');
+      confirmationText = document.getElementById('confirmation-text');
+      resultContainer = document.getElementById('result-container');
+      codeMessageArea = document.getElementById('code-message-area');
+    });
+
+    function showMessage() {
+      currentName = nameInput.value;
+      if (currentName.trim() === '') { alert('Please enter your name first！'); return; }
+      confirmationText.innerText = `Are you sure you are "${currentName}" ?`;
+      modalOverlay.style.display = 'flex';
+    }
+
+    function cancelConfirmation() {
+      modalOverlay.style.display = 'none';
+    }
+
+    function confirmName() {
+      modalOverlay.style.display = 'none';
+      const messageToShow = (currentName in messages) ? messages[currentName] : `Who are you ${currentName}? No message for you.`;
+      codeMessageArea.innerHTML = '';
+      typeMessage(messageToShow, codeMessageArea);
+      inputContainer.style.display = 'none';
+      resultContainer.style.display = 'block';
+    }
+
+    function typeMessage(message, element) {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      let index = 0;
+      element.innerHTML = '<span class="typing-cursor"></span>';
+      typingInterval = setInterval(() => {
+        if (index < message.length) {
+          const cursorSpan = element.querySelector('.typing-cursor');
+          const charNode = document.createTextNode(message[index]);
+          if (cursorSpan) element.insertBefore(charNode, cursorSpan);
+          element.scrollTop = element.scrollHeight;
+          index++;
+        } else {
+          clearInterval(typingInterval);
+          typingInterval = null;
+          element.querySelector('.typing-cursor').remove();
+        }
+      }, 80);
+    }
+
+    function resetToStart() {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      resultContainer.style.display = 'none';
+      inputContainer.style.display = 'block';
+      nameInput.value = '';
+      codeMessageArea.innerHTML = '';
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>\感恩叩謝瑪偲/</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    @font-face { 
+      font-family: 'Cubic 11'; 
+      src: url('https://cdn.jsdelivr.net/npm/man-tout-font@1.0.1/font/MTC.woff2') format('woff2'); 
+    }
+
+    /* 🔴⚫ 深紅＋黑主題 */
+    body { 
+      font-family: 'Cubic 11', 'Press Start 2P', cursive; 
+      background-color: #120507;       /* 幾乎黑的深紅底 */
+      color: #fbe3e3; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      margin: 0; 
+      overflow: hidden; 
+      image-rendering: pixelated;
+    }
+
+    .container { 
+      position: relative; 
+      text-align: center; 
+      background-color: #1f1012;       /* 內框深咖紅 */
+      padding: 30px; 
+      border-radius: 0; 
+      border: 4px solid #b0181a;       /* 飽和暗紅邊框 */
+      box-shadow: 8px 8px 0px #460b0d; /* 深紅陰影 */
+      width: 90%; 
+      max-width: 450px; 
+    }
+
+    #result-container { display: none; }
+
+    h1 { 
+      font-size: 22px; 
+      line-height: 1.5; 
+      color: #ff4a4a;                  /* 標題亮紅 */
+    }  
+
+    p { 
+      line-height: 1.5; 
+      font-size: 14px; 
+      color: #f7d9d9;
+    }
+
+    input[type="text"] { 
+      width: 80%; 
+      padding: 10px; 
+      margin-bottom: 15px; 
+      border: 2px solid #b0181a;       
+      background-color: #2b1517; 
+      border-radius: 0; 
+      font-size: 12px; 
+      font-family: 'Cubic 11', 'Press Start 2P', cursive; 
+      color: #fbe3e3;
+    }
+    input::placeholder { 
+      color: #c77777; 
+      font-size: 9px; 
+    }
+
+    button { 
+      background-color: #b0181a;       /* 暗紅按鈕 */
+      color: #fbe3e3; 
+      padding: 12px 20px; 
+      border: 2px solid #f25b5b; 
+      cursor: pointer; 
+      font-size: 12px; 
+      border-radius: 0;
+      font-family: 'Cubic 11', 'Press Start 2P', cursive; 
+      transition: none; 
+    }
+
+    button:hover, button:active { 
+      background-color: #e03333; 
+      color: #fff5f5; 
+    }
+
+    #code-message-area {
+      background-color: #050203;       /* 幾乎全黑的訊息底 */
+      color: #ffb8b8;                  /* 柔和粉紅字 */
+      font-family: 'Courier New', Courier, monospace; 
+      font-size: 14px;
+      text-align: left; 
+      padding: 15px; 
+      border: 2px solid #b0181a;
+      min-height: 100px;
+      max-height: min(40vh, 260px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      line-height: 1.6; 
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    #code-message-area::-webkit-scrollbar { width: 10px; }
+    #code-message-area::-webkit-scrollbar-track { background: #140709; }
+    #code-message-area::-webkit-scrollbar-thumb { background: #b64c4c; border-radius: 6px; }
+    #code-message-area::-webkit-scrollbar-thumb:hover { background: #d87575; }
+
+    .typing-cursor {
+      display: inline-block;
+      background-color: #ffb8b8;
+      width: 8px;
+      height: 1.1em;
+      margin-left: 1px;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      from, to { background-color: transparent; }
+      50% { background-color: #ffb8b8; }
+    }
+
+    /* Modal */
+    .modal-overlay { 
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%; 
+      background-color: rgba(0, 0, 0, 0.7); 
+      display: none; 
+      justify-content: center; 
+      align-items: center; 
+      z-index: 1000; 
+    }
+
+    .modal-content { 
+      background-color: #1f1012; 
+      padding: 25px; 
+      border-radius: 0; 
+      border: 4px solid #b0181a; 
+      text-align: center; 
+      box-shadow: 8px 8px 0px #460b0d; 
+      width: 90%; 
+      max-width: 400px; 
+    }
+
+    .modal-content p { 
+      font-size: 14px; 
+      margin-bottom: 25px; 
+      line-height: 1.5; 
+      color: #f7d9d9; 
+    }
+
+    .modal-buttons { 
+      display: flex; 
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-buttons button { 
+      width: 100%; 
+      padding: 15px 20px; 
+      font-size: 10px;
+    }
+
+    #confirm-btn { background-color: #b0181a; }
+    #confirm-btn:hover { background-color: #e03333; }
+
+    #cancel-btn { background-color: #3b1b1d; }
+    #cancel-btn:hover { background-color: #55262a; }
+
+  </style>
+</head>
+
+<body>
+  <div id="input-container" class="container">
+    <h1>For Mars</h1>
+    <p>Please enter your name</p>
+    <input type="text" id="name-input" placeholder="e.g.Mars, Capitalize the first letter">
+    <button onclick="showMessage()">see message</button>
+  </div>
+
+  <div id="result-container" class="container">
+    <p>Message for you:</p>
+    <pre id="code-message-area"></pre>
+    <button onclick="resetToStart()">Best regards !</button>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <p id="confirmation-text">This is a confirmation message</p>
+      <div class="modal-buttons">
+        <button id="confirm-btn" onclick="confirmName()">I've checked it out.</button>
+        <button id="cancel-btn" onclick="cancelConfirmation()">My bad. Let me start over.</button>
+      </div>
+    </div>
+  </div>
+
+  <script defer>
+    const messages = {
+      'Mars': `嗨瑪偲 不知道你喜不喜歡紅色
+嚴格來說，你也當了我一年的主管呢(管它什麼組織架構的前提下)
+
+謝謝公司異想天開把我推進RPA的場域，然後也莫名其妙完成了很多小專案，但我知道那是沒有你、溫哥、阿瑞、Ben我就沒有辦法做到的，真的很謝謝這一個團隊餒 !
+
+謝謝在我完全是0的狀態下，你在泰國會議室帶著我一步一步看流程，寫了整個白板我也還是似懂非懂，但是是滿滿的感激QQ
+但那段時間是我在AY覺得自己進步最多最有感的時候喔! 因為那時候我根本不會寫JS、不懂甚麼是API、看不懂AY哆啦A夢、也不會畫流程圖、也聽不懂需求方到底想幹嘛，一直到後來知道迴圈要放哪裡、迴圈外面再一個迴圈，當然更多的時候是我扛著電腦去你旁邊給你一行一行debug哈哈哈哈哈耶一 !
+ʕ·ᴥ·ʔ?  ʕᴥ·　ʔ  -> 大概長這樣
+(你在看我不知道怎麼寫出來的大便 啊我自己也滿頭問號這樣
+
+不過也是因為這段時間，讓我又重新想了一次自己的目標，感覺好像可以不只這樣，好像就覺得我可以做到的事情變多了，雖然我知道自己缺少的東西真的還很多、雖然去年研究所的筆試也沒有過(今年會再試試看北教大的碩士申請的)，但好像就是又重新找到可以努力的事情了，重新又有滿滿動力的呦!
+
+謝謝AY有瑪偲，謝謝RPA有瑪偲 !
+P.S.但還是祝您早日發大財脫離苦海`
+    };
+
+    let currentName = '';
+    let typingInterval = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      inputContainer = document.getElementById('input-container');
+      nameInput = document.getElementById('name-input');
+      modalOverlay = document.getElementById('modal-overlay');
+      confirmationText = document.getElementById('confirmation-text');
+      resultContainer = document.getElementById('result-container');
+      codeMessageArea = document.getElementById('code-message-area');
+    });
+
+    function showMessage() {
+      currentName = nameInput.value;
+      if (currentName.trim() === '') { alert('Please enter your name first！'); return; }
+      confirmationText.innerText = `Are you sure you are "${currentName}" ?`;
+      modalOverlay.style.display = 'flex';
+    }
+
+    function cancelConfirmation() {
+      modalOverlay.style.display = 'none';
+    }
+
+    function confirmName() {
+      modalOverlay.style.display = 'none';
+      const messageToShow = (currentName in messages) ? messages[currentName] : `Who are you ${currentName}? No message for you.`;
+      codeMessageArea.innerHTML = '';
+      typeMessage(messageToShow, codeMessageArea);
+      inputContainer.style.display = 'none';
+      resultContainer.style.display = 'block';
+    }
+
+    function typeMessage(message, element) {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      let index = 0;
+      element.innerHTML = '<span class="typing-cursor"></span>';
+      typingInterval = setInterval(() => {
+        if (index < message.length) {
+          const cursorSpan = element.querySelector('.typing-cursor');
+          const charNode = document.createTextNode(message[index]);
+          if (cursorSpan) element.insertBefore(charNode, cursorSpan);
+          element.scrollTop = element.scrollHeight;
+          index++;
+        } else {
+          clearInterval(typingInterval);
+          typingInterval = null;
+          element.querySelector('.typing-cursor').remove();
+        }
+      }, 80);
+    }
+
+    function resetToStart() {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      resultContainer.style.display = 'none';
+      inputContainer.style.display = 'block';
+      nameInput.value = '';
+      codeMessageArea.innerHTML = '';
+    }
+  </script>
+
+</body>
+</html>
