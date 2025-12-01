@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>\謝謝大家/</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    @font-face {
+      font-family: 'Cubic 11';
+      src: url('https://cdn.jsdelivr.net/npm/man-tout-font@1.0.1/font/MTC.woff2') format('woff2');
+    }
+
+    body {
+      font-family: 'Cubic 11', 'Press Start 2P', cursive;
+      background-color: #b3bec4;          
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      image-rendering: pixelated;
+    }
+
+    .container {
+      position: relative;
+      text-align: center;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 0;
+      border: 4px solid #19a8ff;          
+      box-shadow: 8px 8px 0px #00749c;    
+      width: 90%;
+      max-width: 450px;                   
+    }
+
+    #result-container { display: none; }
+
+    h1 {
+      font-size: 22px;
+      line-height: 1.5;
+      color: #004c6b;                      
+    }
+
+    p {
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 2px solid #19a8ff;          
+      border-radius: 0;
+      font-size: 12px;
+      font-family: 'Cubic 11', 'Press Start 2P', cursive;
+      background-color: #f7fcff;          
+      color: #333;
+    }
+    input::placeholder {
+      color: #89bfe8;
+      font-size: 9px;
+    }
+
+    button {
+      background-color: #ffd836;          
+      color: #2b2b2b;
+      padding: 12px 20px;
+      border: 2px solid #19a8ff;          
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'Cubic 11', 'Press Start 2P', cursive;
+      transition: none;
+    }
+    button:hover,
+    button:active {
+      background-color: #ffe772;          
+      color: #111;
+    }
+
+    #code-message-area {
+      background-color: #ffffff;
+      color: #304555;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      text-align: left;
+      padding: 15px;
+      border: 2px solid #19a8ff;
+      min-height: 100px;
+      max-height: min(40vh, 260px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 15px;
+      position: relative;
+    }
+
+    #code-message-area::-webkit-scrollbar { width: 10px; }
+    #code-message-area::-webkit-scrollbar-track { background: #e0f4ff; }
+    #code-message-area::-webkit-scrollbar-thumb { background: #19a8ff; border-radius: 6px; }
+    #code-message-area::-webkit-scrollbar-thumb:hover { background: #007ed1; }
+
+    .typing-cursor {
+      display: inline-block;
+      background-color: #19a8ff;
+      width: 8px;
+      height: 1.1em;
+      margin-left: 1px;
+      vertical-align: baseline;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      from, to { background-color: transparent; }
+      50% { background-color: #19a8ff; }
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.65);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background-color: #ffffff;
+      padding: 25px;
+      border-radius: 0;
+      border: 4px solid #19a8ff;          
+      text-align: center;
+      box-shadow: 8px 8px 0px #00749c;    
+      width: 90%;
+      max-width: 400px;                   
+    }
+
+    .modal-content p {
+      font-size: 14px;
+      margin-bottom: 25px;
+      line-height: 1.5;
+      color: #304555;
+    }
+
+    .modal-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-buttons button {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 10px;
+    }
+
+    #confirm-btn {
+      background-color: #ffd836;          
+      border-color: #19a8ff;
+    }
+    #confirm-btn:hover {
+      background-color: #ffe772;
+    }
+
+    #cancel-btn {
+      background-color: #fff3b0;          
+      border-color: #19a8ff;
+    }
+    #cancel-btn:hover {
+      background-color: #fff7cc;
+    }
+
+    @media (max-width: 500px) {
+      .container { width: 85%; padding: 15px; }
+      h1 { font-size: 18px; }
+      button { padding: 10px 15px; font-size: 11px; }
+      #code-message-area { font-size: 12px; min-height: 80px; }
+      .modal-content { padding: 20px; max-width: 90%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="input-container" class="container">
+    <h1>For UUU</h1>
+    <p>Please enter your name</p>
+    <input type="text" id="name-input" placeholder="e.g.Annby, Capitalize the first letter">
+    <button onclick="showMessage()">see message</button>
+  </div>
+
+  <div id="result-container" class="container">
+    <p>Message for you:</p>
+    <pre id="code-message-area"></pre>
+    <button onclick="resetToStart()">Best regards !</button>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal-content">
+      <p id="confirmation-text">This is a confirmation message</p>
+      <div class="modal-buttons">
+        <button id="confirm-btn" onclick="confirmName()">I've checked it out.</button>
+        <button id="cancel-btn" onclick="cancelConfirmation()">My bad. Let me start over.</button>
+      </div>
+    </div>
+  </div>
+
+  <script defer>
+    const messages = {
+      'Kristy': `歐逆!!!我要畢業了餒!
+一開始在上載的時候，秋西要我有關KR上載的就問你(歐膩)，阿但我根本不知道妳長怎樣哈哈哈哈哈，我以前就真的很討厭上載，希望在這中間有講過甚麼不禮貌的話都請您大人有大量，原釀我!
+謝謝到最後一年我可以在22樓一直吵妳，經過都會想要按一下門鈴的那種喔ʕ·ᴥ·ʔ
+安比我要自己去外面闖盪了 !
+祝接下來的每一天
+辦公室很煩的人都不要煩妳，身體健康事事順心 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Tongtong': `彤桑! 我要離開這裡了喔!
+很煩的人、很煩的事很多，謝謝有妳的存在偶爾可以跟妳抱個怨(以前比較常)，後來我們在不同樓層我都在煩歐膩，謝謝從上載就認識妳們，雖然我很常在辦公室耍白癡，但必須老實地說，辦公室的阿姐裡最喜歡妳們兩個了呦 ʕ·ᴥ·ʔ
+安比我阿! 要自己去外面闖盪了喔 !
+祝接下來的每一天
+辦公室很煩的人都不要煩妳，身體一定要健康喔 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Alice': `愛麗絲呀~~~ 安比要先畢業了呦! 
+啊我不在妳要記得去零食表單許願小老闆海苔喔，後來我很常許了都沒送來，壞死了= =
+
+祝妳身體健康事事順心 生意興隆賺大錢!
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'May': `May !
+謝謝一起短暫做了一個富士山登山的專案，必須對於讓妳遇到一個什麼都不知道又很討厭專案的我，還是感到非常抱歉呦哈哈哈哈哈哈，我這邊就直接引咎辭職了不贅述喇 (這家公司的人不知道為什麼在報告的時候特別愛講"我就不贅述了"，我覺得很好笑)
+
+安比要先走了喔!
+祝妳身體健康事事順心 早日脫離苦海 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Melody': `樂蒂呀 !
+原諒我很不擅長跟大家說掰掰，所以才會請Ariel不到最後一刻不要告訴大家，不是故意的呦 !
+
+雖然妳不常在台北就沒有辦法上班一起玩，但我都很期待每次team building大家到齊的時候喔，以前大家就像是一個大家庭一樣溫馨溫馨的 !
+
+現在安比要先走了喔!
+祝妳天天開心事事順心 早日脫離苦海 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Nickey': `妮基!
+很突然我就要畢業咧!
+原諒我很不擅長跟大家說掰掰，所以才會拖到最後一刻(甚至是丹尼畢業的聚餐才講)，不是故意的呦 !
+
+很開心最後一年很常一起玩，不知道妳會不會覺得跟我們這一群屁孩一起玩會不會很吵又很累，尤其我上次又醉又吐的，期待妳也開始長出可以喝酒的體質，加入抱馬桶俱樂部(目前只有我一個人謝謝)!
+
+阿安比要先走了喔!
+祝妳身體健康事事順心 牛年記得互相提醒點平安燈 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Helen': `海倫!
+
+很突然的 安比要掰了喔!
+祝妳身體健康事事順心，謝謝CS大大們總是這麼給力!
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Gizmo': `學姊!!!歐膩!!!
+還好在最後一年至少有在旅展前後一起做了點什麼 !
+(就算只是成為yoyo的靈魂不是做什麼正事哈哈哈哈哈哈
+我也覺得非常開心喔!
+
+原諒我就很不擅長講掰掰這些的，謝謝歐膩這些日子的照顧
+必須得說，AY的周邊因為有妳，真的變得好可愛每個都好想拿，
+感謝AY有妳，感謝妳是我的歐膩，
+安比要先走了喔!
+祝妳身體健康事事順心 早日脫離苦海 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Lily': `粒粒阿~~~
+才剛相認不久A104的我就要走咧 !
+
+妳是一個很棒的小朋友喔 一起繼續加油!
+AY的零食櫃底下有很多比較好吃的東西，趕快去開(不要說是我教的)
+
+安比要先走了喔!
+祝妳天天開心事事順心 尾牙見 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Percy': `波西~~~~~
+
+謝謝在公司這段時間的照顧，以前跟PM溝通有問題的時候，可能都要麻煩Ariel跟妳說，辛苦妳了 希望沒有造成妳太多困擾，以後不會再繼續製造困擾了 !
+
+安比我要自己去外面闖盪了 !
+祝接下來的每一天
+辦公室很煩的人都不要煩妳，身體健康事事順心 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Eva': `Eva~~~~~
+
+謝謝CS大統領這些日子的照顧，CS的大大們永遠都很罩，啊以後安比不會再製造出更多麻煩了，請大統領放心 !
+
+安比我要自己去外面闖盪了 !
+祝接下來的每一天
+辦公室很煩的人都不要煩妳，身體健康事事順心 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Aray': `瑞哥 !
+
+沒有你我就沒有辦法在RPA活下去了，謝謝在那段時間的照顧 !
+以後還是要記得吃飯跟睡覺喔 (啊藥少吃
+
+安比我要自己去外面闖盪了 !
+祝接下來的每一天
+開發順利 永遠都走happy path
+身體健康事事順心 
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Winston': `老溫 !
+
+謝謝在RPA那段時間的照顧 !
+尤其是我整個需求都聽不懂你來救我那次 \永遠感激/
+
+安比我要自己去外面闖盪了 !
+祝接下來的每一天
+開發順利 永遠都走happy path身體健康事事順心 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Kelly': `凱莉呀!
+
+謝謝AY讓我們相遇
+安比要出去闖盪了呦 !
+要好好在這裡活下去，妳是最棒的 !
+每天都很有精神看起來很快樂就贏一半了， 妳做得到!
+
+祝妳天天開心事事順心 身體健康
+辦公室很煩的事情都與妳無關 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Phoebe': `菲比呀
+
+還是覺得抱歉尾牙工作人員丟下妳了~
+阿妳會在AY活得很久，我就不擔心了哈哈哈哈哈
+以後零食許願清單沒有我怎麼辦咧就會很少人上去填欸
+我最喜歡0咖啡因的麥茶了，謝謝HR每次都滿足我的心願
+
+安比要出去闖盪了呦 ! 掰掰咧
+祝妳天天開心事事順心 尾牙見 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Susu': `SU !!!!!!!!!
+
+原諒我就是很不擅長講掰掰，在最後一刻的最後才告訴妳 !
+還是可以相約尾牙見，但是不會在chat串上再tag CS大大們處理安比搞得麻煩了，no more Expedia , no more 富士山登山，謝謝AY有妳，也謝謝那個有我有妳有大家的上載team。
+
+現在安比要先走了喔!
+祝妳天天開心事事順心 身體健康
+早日脫離苦海 !
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Zumi': `嚕咪 !!!!!
+
+妳絕對是AY的HR小太陽，
+好像不管發生什麼事情妳都還是可以很溫暖地對人，
+每次遇到問題第一個想法都是想說: 找嚕咪! (撇除什麼HRBP的分配哈哈哈哈哈哈哈
+
+謝謝以前我還有跟你們一起出去玩，
+也謝謝HR的大家都對我很好，
+
+安比要先走了喔!
+祝妳天天開心事事順利 尾牙見餒 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Christy': `Christy~~
+
+好像就是在RPA那一年比較常跟妳說話(雖然都不是什麼好事哈哈哈哈哈哈
+總是一把鼻涕一把眼淚的真的很好笑
+沒事的都已經過去了 !
+
+等妳回來上班我就已經不在了呦，會懷念以前一起出去玩的時光的。
+安比要出去闖盪了呦 ! 掰掰咧
+祝妳天天開心事事順心
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Shelly': `雪莉阿~~
+
+我在公司3年多而已喇真的沒有很久，
+突然就要掰掰了嚇到妳咧
+謝謝在訂房跟登山有短暫交會過，阿還有謝謝MKT總是找我一起拍影片一起玩，
+真的很喜歡這間公司的大家呦!
+
+阿安比要先走了喔!
+祝妳天天開心跑步萬歲 尾牙見 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Sharon': `雪倫 !!!
+
+謝謝最後一年有跟MKT的你們一起玩，這間辦公室最需要的就是有趣ㄉ人了
+能夠一起拍影片一起玩是我的榮幸喔 !
+
+安比要出去闖盪了呦 ! 掰掰咧
+祝妳天天開心事事順心 尾牙見 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Bill': `比爾 !!
+
+謝謝辦公室有你，雖然公司一直拿舊電腦打發我哈哈哈哈哈
+不管是鍵盤被我敲爆那台、還是現在手上這台 通通還給你喇 !
+
+感謝AY有你，有時候還會讓我問一些設備或是系統的問題
+我會繼續加油，你也要喔!
+
+安比要出去闖盪了呦 ! 
+祝你天天開心事事順心 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Boris': `導演好 !
+
+謝謝MKT總是找我一起拍影片一起玩，就算我超尬 耶嘿
+謝謝你總是鼓勵每次看到鏡頭就不知道在幹嘛的我，
+(拍片還是比上班有趣一百倍的
+
+感謝有你這個大導演，讓AY真的多了很多有趣的影片呦 !
+
+安比我要出去闖盪了呦 ! 
+祝你天天開心事事順心 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Nicole': `尼扣大大 !!
+
+謝謝這一大段時間的照顧，不管是訂房還是登山，謝謝在我遇到問題總是伸出援手的CS大大們，啊以後我不會再製造出更多麻煩了，請大大們敬請放心 !
+
+安比要畢業了呦!
+祝妳天天開心事事順心 身體健康
+早日發大財脫離苦海 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Ian': `Ian !
+
+我要登出AY了喔 !
+謝謝你總是很有耐心地回答我問題，有時候還要讓你解釋兩三遍，不管是在RPA還是Project Y都有被你救援過，十分感恩QQ
+感謝AY有你，感謝對到的PM是你 耶嘿
+
+祝你天天開心事事順心 身體健康
+早日發大財脫離苦海 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Synrie': `Synrie~~~
+
+謝謝Synrie有一群很棒又有趣的隊員們，
+讓我在AY的最後一年，不管是拍影片還是穿著YOYO參加記者會，我都一起玩得很開心喔 !
+
+安比要出去闖盪了呦 ! 掰掰咧
+祝妳天天開心事事順心 身體健康
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Andy': `安迪哥~~
+
+以後尾牙不會再有人跟你的名字搞混了呦 ^_^
+謝謝MKT的大家，讓我在AY的最後一年玩得很開心 !
+
+安比要出去闖盪了咧 掰掰 !
+祝你天天開心事事順心 身體健康
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Peter': `Peter~~
+
+在公司第三年終於排到停車位了，但也要還回去了哈哈哈哈
+謝謝在那之前，Peter願意讓我停在你的位置上 !
+
+安比要出去闖盪了咧 掰掰 !
+祝Peter事事順心 身體健康
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Kokomi': `Ko大!!
+
+謝謝這一大段時間的照顧，不管是什麼專案，謝謝在我遇到問題總是伸出援手的大大們 !
+謝謝總是很罩的大大們，辛苦了，以後安比不會再惹麻煩了 !
+祝妳天天開心事事順心 身體健康
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Lynn': `Lynn~~
+
+謝謝在Project Y這段時間的照顧，也謝謝在那段時間裡我有問題妳都很願意回答我跟教我(Weekly是真的很花時間喇哈哈哈哈哈哈) !
+
+安比要出去闖盪了呦 掰掰 !
+祝妳天天開心事事順心 身體健康 早點下班 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Misha': `Misha~~
+
+安比我要畢業咧 !
+雖然我記得我們工作上上好像沒有對到過，但我們在同一場Imagine Dragons的演唱會裡哈哈哈哈哈哈，
+如果有下次，再一起同一場一次 !
+
+祝妳事事順心 身體健康 早點下班 
+永遠搶得到票 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Jen': `Jen !
+
+謝謝在Project Y這段時間的照顧，我忘記我問過妳什麼問題但我記得妳回答我超仔細的，謝謝這個世界上所有有耐心的人類(妳是之一呦) !
+
+安比要出去闖盪了呦 掰掰 !
+祝妳天天開心事事順心 身體健康 趕快下班 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'James': `嗨詹姆士
+
+我走咧掰掰 哈哈哈哈哈哈哈哈哈哈
+要照顧好辦公室的姐姐們喔 !
+
+祝你身體健康 趕快下班 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Yolanda': `Yoyo呀 !!
+
+安比要畢業了呦 !
+謝謝在AY所有時間的照顧，以前如果在討論流程的時候有比較不禮貌的地方都請妳忘光光，忘不了的話就請您原釀我哈哈哈哈哈哈哈
+我很喜歡以前跟妳們一起出去玩的時候呦!
+
+祝妳天天開心事事順心 身體健康 趕快下班 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Amy': `艾咪 !!
+
+謝謝這一大段時間的照顧，不管是哪一個專案上，謝謝AY的PM大大們都對我如此善良!
+
+祝妳天天開心事事順心 身體健康 趕快下班 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Zac': `嗨查克
+
+安比要畢業囉 !
+要記得多睡覺和運動喔哈哈哈哈哈哈
+
+祝你趕快下班 ! 晚安 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Zoe': `Zoe !
+
+謝謝MKT的大家讓我在AY的最後一年玩到很多不一樣的事情，AY有一群有趣的人在實在是太重要了 !
+謝謝MKT有你們，謝謝你們在22樓。
+
+安比要出去闖盪了呦 ! 掰掰咧
+祝妳天天開心事事順心 尾牙見 !
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+      'Cindy':`Cindy & CK :
+謝謝在AY這段時間的照顧，也謝謝這間公司讓我學會了很多事情 !
+安比要自己出去闖盪了呦 !
+祝你們 平平安安身體健康
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`,
+'CK':`Cindy & CK :
+謝謝在AY這段時間的照顧，也謝謝這間公司讓我學會了很多事情 !
+安比要自己出去闖盪了呦 !
+祝你們 平平安安身體健康
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`
+    };
+
+    let currentName = '';
+    let typingInterval = null;
+    let inputContainer, nameInput, modalOverlay, confirmationText, resultContainer, codeMessageArea;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      inputContainer = document.getElementById('input-container');
+      nameInput = document.getElementById('name-input');
+      modalOverlay = document.getElementById('modal-overlay');
+      confirmationText = document.getElementById('confirmation-text');
+      resultContainer = document.getElementById('result-container');
+      codeMessageArea = document.getElementById('code-message-area');
+    });
+
+    function showMessage() {
+      currentName = nameInput.value;
+      if (currentName.trim() === '') { alert('Please enter your name first！'); return; }
+      confirmationText.innerText = `Are you sure you are "${currentName}" ?`;
+      modalOverlay.style.display = 'flex';
+    }
+
+    function cancelConfirmation() {
+      modalOverlay.style.display = 'none';
+    }
+
+    function confirmName() {
+      modalOverlay.style.display = 'none';
+      const messageToShow = (currentName in messages) ? messages[currentName] : `謝謝AY讓我們遇見呦! 祝你接下來一切順利!
+
+ʕ·ᴥ·ʔ安比敬上 2025.12.12`;
+      codeMessageArea.innerHTML = '';
+      typeMessage(messageToShow, codeMessageArea);
+      inputContainer.style.display = 'none';
+      resultContainer.style.display = 'block';
+    }
+
+    function typeMessage(message, element) {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      let index = 0;
+      element.innerHTML = '<span class="typing-cursor"></span>';
+      typingInterval = setInterval(() => {
+        if (index < message.length) {
+          const cursorSpan = element.querySelector('.typing-cursor');
+          const charNode = document.createTextNode(message[index]);
+          if (cursorSpan) element.insertBefore(charNode, cursorSpan);
+          element.scrollTop = element.scrollHeight;
+          index++;
+        } else {
+          clearInterval(typingInterval);
+          typingInterval = null;
+          const cursorSpan = element.querySelector('.typing-cursor');
+          if (cursorSpan) cursorSpan.remove();
+        }
+      }, 80);
+    }
+
+    function resetToStart() {
+      if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+      resultContainer.style.display = 'none';
+      inputContainer.style.display = 'block';
+      nameInput.value = '';
+      codeMessageArea.innerHTML = '';
+    }
+  </script>
+</body>
+</html>
